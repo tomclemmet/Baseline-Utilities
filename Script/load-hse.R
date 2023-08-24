@@ -1,16 +1,18 @@
-# Loading packages
-require(tidyverse)
-theme_set(theme_bw())
+# This script loads the .tab files for each desired HSE round, selects the
+# relevant variables, joins the datasets together, and adds the TTO scores.
 
-# Loading and tidying the data
+# Loading packages
+pacman::p_load(readr, dplyr, eq5d)
 hse <- tibble()
 yrs <- c("03", "04", "05", "06", "08", "10", "11", "12", "14")
+
+# For loop over each year of the HSE
 for (i in yrs) {
   # Reading the .tab file
   df <- read_tsv(paste("Data/hse", i, "ai.tab", sep = ""))
   # Making all names lower-case for consistency
   names(df) <- tolower(names(df))
-  # Adjusting for 2014 censoring at 90+
+  # Adjusting for 2014 censoring at 90+. 92.5 is the mean age for those over 90 in the 2013 HSE.
   if (i == "14")  {df <- df |> mutate(age = case_match(age90, 90 ~ 92.5, .default = age90))}
   
   df <- df |> 
@@ -29,7 +31,7 @@ for (i in yrs) {
     ) |> 
     # Filtering out missing values
     filter(! if_any(everything(), ~. %in% c(-9, -8, -2, -1)))
-  # Pooling data together
+  # Joining data together
   hse <- hse |> bind_rows(df)
 }
 # Removing the temporary variables
@@ -42,37 +44,3 @@ hse$Index <- eq5d::eq5d(
   country = "UK",
   type = "TTO"
 )
-
-# Density plot of ages in different years
-hse |> ggplot(aes(x=Age, colour=as.factor(Year))) +
-  geom_density() +
-  
-  labs(title = "Density Plot of Ages for Different HSE Rounds") +
-  scale_colour_viridis_d(name = "Year")
-ggsave("Output/age_dist.png", height = 4, width = 7)
-
-# Density plot of indices in different years
-hse |> ggplot(aes(x=Index, colour=as.factor(Year))) +
-  geom_density(linewidth=0.2) +
-  
-  labs(title = "Density plot of HSUVs for Different HSE Rounds") +
-  coord_cartesian(ylim=c(0, 2.5)) +
-  scale_colour_viridis_d(name = "Year")
-
-ggsave("Output/HSUV_dist.png", height = 4, width = 7)
-
-# Plot of mean HSUVs by age and sx
-hse |> 
-  group_by(cut(Year, 4), Age, Sex) |> 
-  filter(! `cut(Year, 4)` %in% c("(2006,2008]", "(2008,2011]")) |> 
-  summarise(n = n(), Mean = mean(Index), .groups = "drop") |> 
-  
-  ggplot(aes(x = Age, y = Mean)) +
-  geom_line(aes(group = `cut(Year, 4)`, colour = `cut(Year, 4)`)) +
-  geom_density(aes(x = Age, fill = `cut(Year, 4)`), alpha = 0.2, inherit.aes = FALSE) +
-  facet_grid(rows = vars(Sex)) +
-  
-  labs(title = "Comparing Mean HSUVs for Early and Late HSE Rounds") +
-  scale_y_continuous(sec.axis = sec_axis(~. * 1000, name = "Sample Size"))
-
-ggsave("Output/HSUV_compare.png", height = 4, width = 7)
