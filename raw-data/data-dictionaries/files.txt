@@ -1,0 +1,10 @@
+files.txt
+hse03ai_UKDA_Data_Dictionary.rtf
+hse04ai_UKDA_Data_Dictionary.rtf
+hse05ai_UKDA_Data_Dictionary.rtf
+hse06ai_UKDA_Data_Dictionary.rtf
+hse08ai_ukda_data_dictionary.rtf
+hse10ai_ukda_data_dictionary.rtf
+hse11ai_ukda_data_dictionary.rtf
+hse12ai_ukda_data_dictionary.rtf
+hse14ai_ukda_data_dictionary.rtf
