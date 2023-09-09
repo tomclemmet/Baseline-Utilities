@@ -4,6 +4,7 @@ Code repository for my dissertation exploring methods for the estimation of base
  
 ## Folder Structure (including .gitignore files):
 
+```
 baseline-utilities
 │   .gitattributes
 │   .gitignore
@@ -84,3 +85,4 @@ baseline-utilities
             2-data.R
             3-results.R
             4-discussion.R
+```
