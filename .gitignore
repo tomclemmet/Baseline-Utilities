@@ -6,5 +6,5 @@
 *.html
 *.txt
 
-.Rproj.user/
+.Rproj.user/*
 !session-info.txt
