@@ -5,3 +5,6 @@
 *.png
 *.html
 *.txt
+
+.Rproj.user
+!session-info.txt
