@@ -1,9 +1,10 @@
 # Baseline Utilities
-
-Code repository for my dissertation exploring methods for the estimation of baseline utilities.
+Code repository for my dissertation MSc Health Economics dissertation entitled "Validating Methods for Estimating Age and Sex Adjusted Baseline Utilities".
+## Abstract
+Age- and sex-adjusted HSUV baselines are sometimes required for HTA submissions, especially since NICE’s 2022 introduction of absolute/proportional QALY shortfalls to determine severity modifiers. Research on estimating these baselines has been sparse and has not considered a broad range of models. I implement a stratified k-fold cross-validation procedure to test the performance of a selection of baseline utility models: an ALDVMM, a range of polynomial models and a range of RCS models. My results fail to support the DSU’s recommendation of the ALDVMM. Polynomial models are useful but higher-order versions produce counterintuitive predictions for older people. RCS models avoid this problem, with the optimal number of knots (i.e. model flexibility) being around 7. However, the differences in models’ baselines seem unlikely to be decisive in economic evaluations, and there are significant difficulties in estimating HSUVs for older people which further research ought to thoroughly investigate.
  
-## Folder Structure (including .gitignore files):
-
+## Folder Structure
+Note that this diagram contains a range of data and image files not available in the repository. This is because some of these files are very large. The raw data files can be accessed from <https://ukdataservice.ac.uk/> and <https://www.ons.gov.uk/>, and all plots and other output files can be reproduced using the code in the script folder. The `run-everything.R` file can be used to easily run all of these scripts in the correct order.
 ```
 baseline-utilities
 │   .gitattributes
