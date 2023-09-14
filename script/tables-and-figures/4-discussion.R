@@ -1,6 +1,6 @@
 # DISCUSSION TABLES AND FIGURES -----------------------------------------------
 
-# Appendices C1-2, referenced in the discussion
+# Appendices D1-2, referenced in the discussion
 
 # Loading packages and data ---------------------------------------------------
 pacman::p_load(dplyr, readr, tidyr, rms, ggplot2)
@@ -8,7 +8,7 @@ theme_set(theme_bw())
 
 hse <- read_csv("data/hse.csv", show_col_types = FALSE)
 
-# Appendix C1-2: RCS-7 Predictions --------------------------------------------
+# Appendix D1: RCS-7 Predictions Table ----------------------------------------
 rcs7 <- lm(Index ~ rcs(Age, 7)*Sex, data = hse)
 quad <- lm(Index ~ poly(Age, 2, raw = TRUE)*Sex, data = hse)
 
@@ -24,6 +24,8 @@ preds <- target |>
   )
 write_csv(preds, "output/4-discussion/app-d1--rcs7.csv")
 
+
+# Appendix D2: RCS-7 Predictions Graph ------------------------------------
 preds |> 
   pivot_longer(c(rcs7, quad), names_to = "Model", values_to = "Fit") |> 
   rename(rcs7 = rcs7_se, quad = quad_se) |> 
@@ -52,4 +54,3 @@ preds |>
     panel.grid.minor = element_blank()
   )
 ggsave("output/4-discussion/app-d2--rcs7.png", height = 6, width = 6)        
-

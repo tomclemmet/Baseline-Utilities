@@ -1,6 +1,6 @@
 # DATA TABLES AND FIGURES -----------------------------------------------------
 
-# Code for tables 1-2, figures 3-6 and appendix A, contained in the data 
+# Code for tables 1-2, figures 3-6 and appendix A1, contained in the data 
 # section
 
 # Loading packages and data ---------------------------------------------------
@@ -99,16 +99,17 @@ hse |>
   ggplot() +
   facet_wrap(vars(Variable), scale = "free") +
   
-  geom_density(aes(x = Value), fill = "#8A8779FF", linewidth = 0) +
+  geom_density(aes(x = Value, fill = Sex), alpha = 0.5, linewidth = 0) +
   
   theme(
-    panel.grid.minor = element_blank()
+    panel.grid.minor = element_blank(),
+    legend.position = "bottom"
   ) +
   labs(
     caption = "Source: Pooled HSE Data 2003-2014",
     y = "Density"
   )
-ggsave("output/2-data/fig-04--distributions.png", height = 4, width = 8)
+ggsave("output/2-data/fig-04--distributions.png", height = 4, width = 7)
 
 # Figure 5: Overall Means and CIs ---------------------------------------------
 hse |>
@@ -138,7 +139,7 @@ ggsave("output/2-data/fig-05--means.png", height = 4, width = 7)
 
 # Figure 6: Std Devs by Age Decile --------------------------------------------
 hse |> 
-  group_by(Age = cut(Age, quantile(Age, seq(0, 1, 0.1)), 
+  group_by(Sex, Age = cut(Age, quantile(Age, seq(0, 1, 0.1)), 
                      include.lowest = TRUE)) |> 
   summarise(var = var(Index),
             se = sd(Index - mean(Index))/sqrt(n()),
@@ -150,7 +151,7 @@ hse |>
   ) |> 
   ggplot(aes(x = Age, y = sd)) +
 
-  geom_col(fill = "#8A8779FF") +
+  geom_col(aes(fill = Sex), position = "dodge") +
 
   labs(
     caption = "Source: Pooled HSE Data 2003-2014",
@@ -158,9 +159,10 @@ hse |>
     x = "Age Decile"
   ) +
   theme(
-    panel.grid.minor = element_blank()
+    panel.grid.minor = element_blank(),
+    legend.position = "bottom"
   )
-ggsave("output/2-data/fig-06--variation.png", height = 4, width = 7)
+ggsave("output/2-data/fig-06--variation.png", height = 5, width = 7)
 
 # (Unused) Age plots for individual dimensions --------------------------------
 hse |> 
@@ -177,8 +179,7 @@ hse |>
   theme(legend.position="bottom",
         panel.grid=element_blank()) +
   scale_y_continuous(breaks=c(0, 0.5, 1)) +
-  scale_fill_viridis_d(
+  scale_fill_discrete(
     name="",
     labels=c("No Problems", "Some Problems", "Extreme Problems"),
-    option = "E", begin = 0.2, end =  0.8, direction = -1
   )

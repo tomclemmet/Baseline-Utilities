@@ -36,7 +36,7 @@ for (i in yrs) {
 }
 rm(df, i, yrs)
 
-# Adding HSUVs using the UK value set and saving ------------------------------
+# Adding HSUVs using the UK's Dolan (1997) value set and saving --------------
 hse$Index <- eq5d::eq5d(
   scores = hse[,3:7],
   version = "3L",

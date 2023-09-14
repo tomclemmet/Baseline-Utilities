@@ -3,7 +3,7 @@
 # This file implements k-fold cross validation for the selected models. The
 # output is a table with predictions errors for every observation for every
 # model, giving maximum flexibility for analysing the results. The output file
-# is saved as `kfold-errs.csv` in the `output/results` folder so that results 
+# is saved as `kfold-errs.csv` in the `output/3-results` folder so that results 
 # can be loaded without re-running the analysis.
 # Note that this file may take some time to run due to the complexity of 
 # fitting the ALDVMM model.

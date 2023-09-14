@@ -70,10 +70,8 @@ etab.age <- errs |>
   )
 write_csv(etab.age, "output/3-results/app-b2--errors.csv")
 
-
-# by sex ------------------------------------------------------------------
-
-bysex <- errs |> 
+# (Unused) Sex-stratified Error Statistics ------------------------------------
+etab.sex <- errs |> 
   group_by(Type, Model, Sex, Fold) |> 
   summarise(
     ME = mean(Error),
@@ -87,51 +85,6 @@ bysex <- errs |>
     MAE = mean(MAE),
     .groups = "drop"
   ) 
-bysex |> 
-  mutate(RMSE.loss = RMSE - filter(bysex, Model == "Linear")$RMSE) |> 
-  filter(! Model %in% exclude) |> 
-  
-  ggplot(aes(x = Model, y = RMSE.loss)) +
-  facet_grid(cols = vars(Type), scale = "free_x", space = "free") +
-  geom_hline(yintercept = 0, linetype = 2) +
-  
-  geom_line(aes(group = Sex, colour = Sex),
-             linewidth = lw, alpha = al) +
-  geom_point(aes(colour = Sex)) +
-  
-  labs(
-    caption = capt,
-    y = "Difference in RMSE"
-  ) +
-  theme(
-    axis.text.x = element_text(angle = 270, vjust = 0.5, hjust = 0.1),
-    panel.grid.minor = element_blank(),
-    strip.text = element_blank()
-  )
-ggsave("output/3-results/rmse-sex.png", width = 7, height = 4)
-
-bysex |> 
-  filter(! Model %in% c(exclude, "ALDVMM")) |> 
-  mutate(Type = case_match(Type, "Linear" ~ "Polynomial", .default = Type)) |> 
-  ggplot(aes(x = Model, y = ME)) +
-  facet_grid(cols = vars(Type), scale = "free_x", space = "free") +
-  geom_hline(yintercept = 0, linetype = 2) +
-  
-  geom_line(aes(group = Sex, colour = Sex),
-            linewidth = lw, alpha = al) +
-  geom_point(aes(colour = Sex)) +
-  
-  labs(
-    caption = capt
-  ) +   
-  theme(
-    axis.text.x = element_text(angle = 270, vjust = 0.5, hjust = 0.1),
-    panel.grid.minor = element_blank(),
-    strip.text = element_blank()
-  )
-
-ggsave("output/3-results/me-sex.png", height = 4, width = 7)
-
 
 # Figure 7: Visualisations for one fold -----------------------------------------
 errs |> 
@@ -221,37 +174,54 @@ errs |>
   ggplot() +
   geom_vline(xintercept = 0, linetype = 2) +
   
-  geom_density(aes(x = Error, fill = Model), alpha = 0.5, linewidth = lw) +
+  geom_density(aes(x = Error, fill = Model), alpha = 0.5, linewidth = 0) +
   
   labs(
     y = "Density",
     caption = "Source: Pooled HSE 2004-2014, 10-fold cross-validation"
   ) +
   coord_cartesian(xlim = c(-1.239, 0.3)) +
+  theme(panel.grid.minor = element_blank()) +
   scale_fill_viridis_d(option = "E", begin = 0.2, end = 0.8)
 
 ggsave("output/3-results/fig-10--errors.png", width = 7, height = 4)
 
 # Figure 11: Overall ME plot ----------------------------------------------------
-etab.ovr |> 
+etab.sex |> 
+  select(-c(RMSE, MAE)) |> 
+  rename(ME_bysex = ME) |> 
+  full_join(select(etab.ovr, -c(RMSE, MAE))) |> 
   filter(! Model %in% c(exclude, "ALDVMM")) |> 
-  mutate(Type = case_match(Type, "Linear" ~ "Polynomial", .default = Type)) |> 
-  ggplot(aes(x = Model, y = ME)) +
+  mutate(
+    Type = if_else(Type == "Linear", "Polynomial", Type),
+    lab1 = "Overall"
+  ) |> 
+  
+  ggplot(aes(x = Model)) +
   facet_grid(cols = vars(Type), scale = "free_x", space = "free") +
   geom_hline(yintercept = 0, linetype = 2) +
   
-  geom_line(aes(group = Type), 
-            colour = "#31446b", linewidth = lw, alpha = al) +
-  geom_point(colour = "#31446b") +
+  geom_line(
+    aes(y = ME_bysex, colour = Sex, group = Sex), 
+    linewidth = lw, alpha = al
+  ) +
+  geom_point(aes(y = ME_bysex, colour = Sex), alpha = al, size = 0.5) +
+    
+  geom_line(
+    aes(y = ME, group = Type, linetype = lab1), 
+    linewidth = lw, colour = "#31446b"
+  ) +
+  geom_point(aes(y = ME, shape = lab1), colour = "#31446b") +
   
   labs(
-    caption = capt
+    caption = capt, linetype = "", shape = ""
   ) +   
   theme(
     axis.text.x = element_text(angle = 270, vjust = 0.5, hjust = 0.1),
     panel.grid.minor = element_blank(),
     strip.text = element_blank()
-  )
+  ) +
+  guides(colour = guide_legend(override.aes = list(alpha = 1))) 
 ggsave("output/3-results/fig-11--me.png", height = 4, width = 7)
 
 # Figure 12: ME plot by age -----------------------------------------------------
@@ -336,13 +306,11 @@ qale <- preds |>
 write_csv(qale, "output/3-results/app-c1--qales.csv")
 
 
-
-
-# Figure 13: QALEs ---------------------------------------------------------
+# Figure 13: QALEs Illustration -----------------------------------------------
 ages <-  c(30, 50, 70, 90)
 s <-  "Female"
 r <- 0.035
-legend
+
 plots <- lapply(ages, function(a) {
   preds |> 
     full_join(lt, by = c("Age", "Sex")) |> 
@@ -372,7 +340,7 @@ plots <- lapply(ages, function(a) {
       legend.position = "bottom",
       panel.grid.minor = element_blank()
     ) +
-    if (! a %in% c(30)) {
+    if (a != 30) {
       theme(
         axis.ticks.y = element_blank(),
         axis.text.y = element_blank(),

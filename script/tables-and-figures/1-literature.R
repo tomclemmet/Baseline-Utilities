@@ -12,7 +12,7 @@ para_baselines <- read_csv("data/para-baselines.csv", show_col_types = FALSE) |>
 
 # Figure 1: Non-Parametric Baselines ------------------------------------------
 nonpara_baselines |>
-  ggplot(aes(x = Ages, y = HSUV, fill = Source)) +
+  ggplot(aes(x = Ages, y = HSUV, fill = forcats::fct_rev(Source))) +
   geom_col(position = "dodge") +
   geom_errorbar(aes(ymin = Min, ymax = Max),
                 position = position_dodge(0.9), width = 0.2) +
@@ -20,7 +20,8 @@ nonpara_baselines |>
   
   coord_cartesian(ylim = c(0.5, 1)) +
   scale_fill_viridis_d(
-    begin = 0.2, end = 0.6, option = "E",
+    name = "Source",
+    begin = 0.2, end = 0.8, option = "E",
     labels = c("Kind et al. (1999)", "Szende et al. (2014)")
     ) +
   theme_bw() +
